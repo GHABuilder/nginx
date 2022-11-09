@@ -35,6 +35,7 @@ jobs:
           tar -xzf ../../zlib-1.2.13.tar.gz
           tar -xzf ../../openssl-3.0.7.tar.gz
           
+          cd ../..
           auto/configure \
             --with-cc=cl \
             --with-debug \
