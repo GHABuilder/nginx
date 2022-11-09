@@ -1,0 +1,62 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.32'
+          distribution: strawberry
+      - uses: ilammy/msvc-dev-cmd@v1
+      
+      - shell: msys2 {0}
+        name: Download and Build
+        run: |
+          git clone https://github.com/nginx/nginx
+          cd nginx
+          curl -L -O https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
+          curl -L -O http://zlib.net/zlib-1.2.13.tar.gz
+          curl -L -O https://www.openssl.org/source/openssl-3.0.7.tar.gz
+          
+          mkdir objs
+          mkdir objs/lib
+          cd objs/lib
+          
+          tar -xzf ../../pcre2-10.40.tar.gz
+          tar -xzf ../../zlib-1.2.13.tar.gz
+          tar -xzf ../../openssl-3.0.7.tar.gz
+          
+          auto/configure \
+            --with-cc=cl \
+            --with-debug \
+            --prefix= \
+            --conf-path=conf/nginx.conf \
+            --pid-path=logs/nginx.pid \
+            --http-log-path=logs/access.log \
+            --error-log-path=logs/error.log \
+            --sbin-path=nginx.exe \
+            --http-client-body-temp-path=temp/client_body_temp \
+            --http-proxy-temp-path=temp/proxy_temp \
+            --http-fastcgi-temp-path=temp/fastcgi_temp \
+            --http-scgi-temp-path=temp/scgi_temp \
+            --http-uwsgi-temp-path=temp/uwsgi_temp \
+            --with-cc-opt=-DFD_SETSIZE=1024 \
+            --with-pcre=objs/lib/pcre2-10.39 \
+            --with-zlib=objs/lib/zlib-1.2.11 \
+            --with-openssl=objs/lib/openssl-1.1.1m \
+            --with-openssl-opt=no-asm \
+            --with-http_ssl_module
+            
+          nmake  
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: all
+          path: ./nginx
+            
