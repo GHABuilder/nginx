@@ -9,6 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: msys2/setup-msys2@v2
+        with:
+          path-type: inherit
       - uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: '5.32'
@@ -51,13 +53,13 @@ jobs:
             --http-scgi-temp-path=temp/scgi_temp \
             --http-uwsgi-temp-path=temp/uwsgi_temp \
             --with-cc-opt=-DFD_SETSIZE=1024 \
-            --with-pcre=objs/lib/pcre2-10.39 \
-            --with-zlib=objs/lib/zlib-1.2.11 \
-            --with-openssl=objs/lib/openssl-1.1.1m \
+            --with-pcre=objs/lib/pcre2-10.40 \
+            --with-zlib=objs/lib/zlib-1.2.13 \
+            --with-openssl=objs/lib/openssl-3.0.7 \
             --with-openssl-opt=no-asm \
             --with-http_ssl_module
             
-          nmake  
+          nmake
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
