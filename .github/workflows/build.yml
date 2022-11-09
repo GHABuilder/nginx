@@ -15,10 +15,13 @@ jobs:
           distribution: strawberry
       - uses: ilammy/msvc-dev-cmd@v1
       
-      - shell: msys2 {0}
-        name: Download and Build
+      - name: Download nginx repo
+        shell: cmd
+        run: git clone https://github.com/nginx/nginx
+        
+      - name: Download and Build
+        shell: msys2 {0}
         run: |
-          git clone https://github.com/nginx/nginx
           cd nginx
           curl -L -O https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.gz
           curl -L -O http://zlib.net/zlib-1.2.13.tar.gz
